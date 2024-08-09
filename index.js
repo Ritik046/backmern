@@ -21,13 +21,16 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+
+
+    mongoose.connect(process.env.MONGODB_URL)
     .then(() => {
         console.log('MongoDB is connected');
     })
     .catch((err) => {
         console.log(err);
     });
+
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
