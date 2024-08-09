@@ -47,6 +47,10 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
         const userDoc = await User.findOne({ username });
+        if (!userDoc) {
+            return res.status(400).json('User not found');
+        }
+
         const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
             jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
@@ -57,7 +61,7 @@ app.post('/login', async (req, res) => {
                 });
             });
         } else {
-            res.status(400).json('wrong credentials');
+            res.status(400).json('Wrong credentials');
         }
     } catch (error) {
         console.log(error);
