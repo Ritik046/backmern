@@ -16,7 +16,7 @@ const app = express();
 const salt = bcrypt.genSaltSync(10);
 const secret = process.env.JWT_SECRET;
 
-app.use(cors({ credentials: true, origin: 'https://effulgent-flan-8f0195.netlify.app' }));
+app.use(cors({ credentials: true, origin: 'https://frontmern-2-nbe5.onrender.com' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
