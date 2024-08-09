@@ -21,16 +21,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-
-
-    mongoose.connect(process.env.MONGODB_URL)
+mongoose.connect(process.env.MONGODB_URL)
     .then(() => {
         console.log('MongoDB is connected');
     })
     .catch((err) => {
         console.log(err);
     });
-
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
@@ -65,8 +62,15 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', (req, res) => {
     const { token } = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({ error: 'JWT token is missing' });
+    }
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) {
+            return res.status(403).json({ error: 'Token is invalid' });
+        }
         res.json(info);
     });
 });
@@ -85,8 +89,15 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     fs.renameSync(path, newPath);
 
     const { token } = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({ error: 'JWT token is missing' });
+    }
+
     jwt.verify(token, secret, {}, async (err, info) => {
-        if (err) throw err;
+        if (err) {
+            return res.status(403).json({ error: 'Token is invalid' });
+        }
         const { title, summary, content } = req.body;
         const postDoc = await Post.create({
             title,
@@ -124,8 +135,15 @@ app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
         fs.renameSync(path, newPath);
     }
     const { token } = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({ error: 'JWT token is missing' });
+    }
+
     jwt.verify(token, secret, {}, async (err, info) => {
-        if (err) throw err;
+        if (err) {
+            return res.status(403).json({ error: 'Token is invalid' });
+        }
         const { id, title, summary, content } = req.body;
         const postDoc = await Post.findById(id);
         const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
